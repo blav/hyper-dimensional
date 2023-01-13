@@ -4,6 +4,7 @@ import java.util.List;
 
 import us.blav.hd.BinaryVector;
 import us.blav.hd.Cosine;
+import us.blav.hd.Metric;
 import us.blav.hd.mnist.MNIST.Digit;
 
 public class TrainedModel {
@@ -21,7 +22,7 @@ public class TrainedModel {
     BinaryVector vector = model.encode (digit);
     Double similarity = null;
     int nearest = - 1;
-    Cosine cosine = model.getHyperspace ().cosine ();
+    Metric cosine = model.getHyperspace ().hamming ();
     for (int current = 0; current < classes.size (); current++) {
       double s = cosine.apply (vector, classes.get (current));
       if (similarity == null || s > similarity) {

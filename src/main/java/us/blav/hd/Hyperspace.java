@@ -17,6 +17,7 @@ public class Hyperspace {
 
   private final Cosine cosine;
 
+  private final Hamming hamming;
 
   public Hyperspace (int dimensions) {
     this (dimensions, new RandomGenerator ());
@@ -30,6 +31,7 @@ public class Hyperspace {
     this.dimensions = dimensions;
     this.randomGenerator = randomGenerator;
     this.cosine = new Cosine (this);
+    this.hamming = new Hamming (this);
   }
 
   public Combiner newCombiner () {
@@ -50,6 +52,10 @@ public class Hyperspace {
 
   public Cosine cosine () {
     return cosine;
+  }
+
+  public Hamming hamming () {
+    return hamming;
   }
 
   public BinaryVector newVector (int... bits) {
