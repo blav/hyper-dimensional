@@ -1,6 +1,5 @@
 package us.blav.hd.mnist;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -9,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
-import org.checkerframework.common.value.qual.IntRange;
+import us.blav.hd.mnist.MNIST.Digit;
 import us.blav.hd.util.Timer;
 
 import static us.blav.hd.mnist.MNIST.Dataset.t10k;
@@ -38,14 +37,23 @@ public class Main {
     TrainedModel trained = new Model (dimensions).train ();
     AtomicInteger success = new AtomicInteger ();
     AtomicInteger count = new AtomicInteger ();
-    try (Timer ignore = new Timer (duration -> System.out.printf ("inference took %ds%n", duration.toSeconds ()))) {
-      new MNIST ().load (t10k).forEach (digit -> {
-        int inferred = trained.infer (digit);
+
+    ParallelProcessor<Integer, Digit, Boolean> processor = ParallelProcessor.<Integer, Digit, Boolean>builder ()
+      .threads (10)
+      .queueSize (10)
+      .keyMapper (Digit::label)
+      .processor (digit -> trained.infer (digit) == digit.label ())
+      .output (result -> {
         count.incrementAndGet ();
-        System.out.printf ("inferring image %d%n", count.get ());
-        if (digit.label () == inferred)
+        if (result)
           success.incrementAndGet ();
-      });
+      })
+      .build ();
+
+    try (Timer ignore = new Timer (duration -> System.out.printf ("inference took %ds%n", duration.toSeconds ()))) {
+      new MNIST ().load (t10k).forEach (processor::process);
+    } finally {
+      processor.shutdown ();
     }
 
     return 100. * success.get () / count.get ();

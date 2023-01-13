@@ -1,7 +1,7 @@
 package us.blav.hd.mnist;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -37,22 +37,22 @@ public class Model {
   }
 
   public TrainedModel train () {
-    try (Timer ignore = new Timer (duration -> System.out.printf ("training took %d%n", duration.toSeconds ()))) {
-      List<Bundler> classes = range (0, 10)
-        .mapToObj (i -> hyperspace.newBundler ())
-        .toList ();
-
-      AtomicInteger count = new AtomicInteger ();
-      new MNIST ().load (train).forEach (digit -> {
-        classes.get (digit.label ()).add (encode (digit));
-        System.out.printf ("image %d%n", count.incrementAndGet ());
-      });
-
-      List<BinaryVector> trainedClasses = classes.stream ()
+    ParallelReducer<Integer, Digit, Bundler, List<BinaryVector>> parallelReducer = ParallelReducer.<Integer, Digit, Bundler, List<BinaryVector>>builder ()
+      .threads (10)
+      .queueSize (10)
+      .keyMapper (Digit::label)
+      .accumulatorFactory (hyperspace::newBundler)
+      .combiner ((bundler, digit) -> bundler.add (encode (digit)))
+      .reducer (map -> map.entrySet ().stream ()
+        .sorted (Entry.comparingByKey ())
+        .map (Entry::getValue)
         .map (Bundler::reduce)
-        .collect (Collectors.toList ());
+        .collect (Collectors.toList ()))
+      .build ();
 
-      return new TrainedModel (this, trainedClasses);
+    try (Timer ignore = new Timer (duration -> System.out.printf ("training took %ds%n", duration.toSeconds ()))) {
+      new MNIST ().load (train).forEach (parallelReducer::accumulate);
+      return new TrainedModel (this, parallelReducer.reduce ());
     }
   }
 
