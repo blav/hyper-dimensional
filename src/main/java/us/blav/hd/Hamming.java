@@ -18,6 +18,6 @@ public class Hamming implements Metric {
     ensureDimensions (hyperspace, a, b);
     return 1. * range (0, hyperspace.dimensions ())
       .filter (i -> a.bits ().get (i) == b.bits ().get (i))
-      .sum () / hyperspace.dimensions ();
+      .count () / hyperspace.dimensions ();
   }
 }
