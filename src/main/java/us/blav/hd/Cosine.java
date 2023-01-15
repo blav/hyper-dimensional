@@ -1,7 +1,6 @@
 package us.blav.hd;
 
 import lombok.NonNull;
-import org.apache.lucene.util.OpenBitSet;
 
 import static java.util.stream.IntStream.range;
 import static us.blav.hd.Metric.ensureDimensions;

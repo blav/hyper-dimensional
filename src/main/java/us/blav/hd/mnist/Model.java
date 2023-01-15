@@ -9,6 +9,7 @@ import us.blav.hd.BinaryVector;
 import us.blav.hd.Bundler;
 import us.blav.hd.Hyperspace;
 import us.blav.hd.mnist.MNIST.Digit;
+import us.blav.hd.util.ParallelReducer;
 import us.blav.hd.util.Timer;
 
 import static java.util.stream.IntStream.range;
@@ -37,18 +38,19 @@ public class Model {
   }
 
   public TrainedModel train () {
-    ParallelReducer<Integer, Digit, Bundler, List<BinaryVector>> parallelReducer = ParallelReducer.<Integer, Digit, Bundler, List<BinaryVector>>builder ()
-      .threads (10)
-      .queueSize (10)
-      .keyMapper (Digit::label)
-      .accumulatorFactory (hyperspace::newBundler)
-      .combiner ((bundler, digit) -> bundler.add (encode (digit)))
-      .reducer (map -> map.entrySet ().stream ()
-        .sorted (Entry.comparingByKey ())
-        .map (Entry::getValue)
-        .map (Bundler::reduce)
-        .collect (Collectors.toList ()))
-      .build ();
+    ParallelReducer<Integer, Digit, Bundler, List<BinaryVector>> parallelReducer =
+      ParallelReducer.<Integer, Digit, Bundler, List<BinaryVector>>builder ()
+        .threads (10)
+        .queueSize (10)
+        .keyMapper (Digit::label)
+        .accumulatorFactory (hyperspace::newBundler)
+        .combiner ((bundler, digit) -> bundler.add (encode (digit)))
+        .reducer (map -> map.entrySet ().stream ()
+          .sorted (Entry.comparingByKey ())
+          .map (Entry::getValue)
+          .map (Bundler::reduce)
+          .collect (Collectors.toList ()))
+        .build ();
 
     try (Timer ignore = new Timer (duration -> System.out.printf ("training took %ds%n", duration.toSeconds ()))) {
       new MNIST ().load (train).forEach (parallelReducer::accumulate);

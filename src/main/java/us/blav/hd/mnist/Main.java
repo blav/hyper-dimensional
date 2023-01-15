@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import us.blav.hd.mnist.MNIST.Digit;
+import us.blav.hd.util.ParallelProcessor;
 import us.blav.hd.util.Timer;
 
 import static us.blav.hd.mnist.MNIST.Dataset.t10k;
@@ -38,17 +39,18 @@ public class Main {
     AtomicInteger success = new AtomicInteger ();
     AtomicInteger count = new AtomicInteger ();
 
-    ParallelProcessor<Integer, Digit, Boolean> processor = ParallelProcessor.<Integer, Digit, Boolean>builder ()
-      .threads (10)
-      .queueSize (10)
-      .keyMapper (Digit::label)
-      .processor (digit -> trained.infer (digit) == digit.label ())
-      .output (result -> {
-        count.incrementAndGet ();
-        if (result)
-          success.incrementAndGet ();
-      })
-      .build ();
+    ParallelProcessor<Integer, Digit, Boolean> processor =
+      ParallelProcessor.<Integer, Digit, Boolean>builder ()
+        .threads (10)
+        .queueSize (10)
+        .keyMapper (Digit::label)
+        .processor (digit -> trained.infer (digit) == digit.label ())
+        .output (result -> {
+          count.incrementAndGet ();
+          if (result)
+            success.incrementAndGet ();
+        })
+        .build ();
 
     try (Timer ignore = new Timer (duration -> System.out.printf ("inference took %ds%n", duration.toSeconds ()))) {
       new MNIST ().load (t10k).forEach (processor::process);

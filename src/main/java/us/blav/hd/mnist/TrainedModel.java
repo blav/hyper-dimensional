@@ -3,7 +3,6 @@ package us.blav.hd.mnist;
 import java.util.List;
 
 import us.blav.hd.BinaryVector;
-import us.blav.hd.Cosine;
 import us.blav.hd.Metric;
 import us.blav.hd.mnist.MNIST.Digit;
 

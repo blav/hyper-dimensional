@@ -1,4 +1,4 @@
-package us.blav.hd.mnist;
+package us.blav.hd.util;
 
 import java.util.Map;
 import java.util.Map.Entry;
