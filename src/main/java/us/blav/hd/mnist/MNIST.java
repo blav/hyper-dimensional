@@ -4,16 +4,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+import com.google.common.annotations.VisibleForTesting;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.SneakyThrows;
+import us.blav.hd.BinaryVector;
+import us.blav.hd.Bundler;
+import us.blav.hd.ClassifierModel;
+import us.blav.hd.Hyperspace;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.IntStream.range;
 import static java.util.stream.StreamSupport.stream;
+import static us.blav.hd.mnist.MNIST.Dataset.t10k;
+import static us.blav.hd.mnist.MNIST.Dataset.train;
 
 public class MNIST {
 
@@ -46,6 +57,35 @@ public class MNIST {
     public int label () {
       return label;
     }
+  }
+
+  @Getter
+  private final Hyperspace hyperspace;
+
+  private final List<BinaryVector> coordinates;
+
+  private final List<BinaryVector> values;
+
+  @Builder
+  public MNIST (int dimensions) {
+    hyperspace = new Hyperspace (dimensions);
+    coordinates = range (0, PIXEL_COUNT)
+      .mapToObj (i -> hyperspace.newRandom ())
+      .toList ();
+
+    values = range (0, 256)
+      .mapToObj (i -> hyperspace.newRandom ())
+      .toList ();
+  }
+
+  public ClassifierModel<Digit, Integer> newModel () {
+    return ClassifierModel.<Digit, Integer>builder ()
+      .hyperspace (hyperspace)
+      .encoder (this::encode)
+      .keyMapper (Digit::label)
+      .trainDataset (() -> load (train))
+      .validateDataset (() -> load (t10k))
+      .build ();
   }
 
   @SneakyThrows (IOException.class)
@@ -106,4 +146,17 @@ public class MNIST {
         }
       });
   }
+
+  @VisibleForTesting
+  BinaryVector encode (Digit digit) {
+    Bundler bundler = hyperspace.newBundler ();
+    range (0, PIXEL_COUNT).forEach (i ->
+      bundler.add (hyperspace.newCombiner ()
+        .add (values.get (digit.pixel (i)))
+        .add (coordinates.get (i))
+        .reduce ()));
+
+    return bundler.reduce ();
+  }
+
 }
