@@ -2,6 +2,7 @@ package us.blav.hd;
 
 import lombok.NonNull;
 import org.apache.lucene.util.OpenBitSet;
+import us.blav.hd.util.OpenBitSetEnh;
 
 public class Bundler implements Accumulator<Bundler> {
 
@@ -30,7 +31,7 @@ public class Bundler implements Accumulator<Bundler> {
 
   public BinaryVector reduce () {
     int dimensions = hyperspace.dimensions ();
-    OpenBitSet result = new OpenBitSet (dimensions);
+    OpenBitSetEnh result = new OpenBitSetEnh (dimensions);
     int threshold = count / 2;
     boolean random = count % 2 == 0;
     for (int i = 0; i < dimensions; i++) {

@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import us.blav.hd.ClassifierTrainedModel;
-import us.blav.hd.mnist.MNIST.Digit;
+import us.blav.hd.mnist.DatasetLoader.Digit;
 import us.blav.hd.util.Timer;
 
 public class Main {
@@ -35,14 +38,21 @@ public class Main {
   }
 
   private static double benchmark (int dimensions) {
-    ClassifierTrainedModel<Digit, Integer> trained = MNIST.builder ()
+    ClassifierTrainedModel<Digit, Integer> trained = HyperVectorModel.builder ()
       .dimensions (dimensions)
       .build ()
       .newModel ()
-      .train ();
+      .train (2000L);
 
-    try (Timer ignore = new Timer (duration -> System.out.printf ("inference took %ds%n", duration.toSeconds ()))) {
-      return trained.computeAccuracy ();
+    AtomicDouble accuracy = new AtomicDouble ();
+    Consumer<Duration> logger = duration -> System.out.printf (
+      "inference for %d dimensions took %dms, accuracy %2.1f%%%n",
+      dimensions, duration.toMillis (), accuracy.get ());
+
+    try (Timer ignore = new Timer (logger)) {
+      double a = trained.computeAccuracy (100L);
+      accuracy.set (a);
+      return a;
     }
   }
 }

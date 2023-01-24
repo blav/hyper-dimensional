@@ -2,8 +2,10 @@ package us.blav.hd;
 
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import org.apache.lucene.util.OpenBitSet;
+import us.blav.hd.util.OpenBitSetEnh;
 
 import static java.util.stream.IntStream.range;
 
@@ -62,7 +64,7 @@ public class Hyperspace {
     if (bits.length != dimensions)
       throw new IllegalArgumentException ();
 
-    OpenBitSet result = new OpenBitSet (dimensions);
+    OpenBitSetEnh result = new OpenBitSetEnh (dimensions);
     range (0, dimensions)
       .filter (i -> bits[i] > 0)
       .forEach (result::fastSet);
@@ -71,11 +73,16 @@ public class Hyperspace {
   }
 
   public BinaryVector newRandom () {
-    OpenBitSet bits = new OpenBitSet (dimensions);
+    OpenBitSetEnh bits = new OpenBitSetEnh (dimensions);
     range (0, dimensions)
       .filter (i -> randomGenerator.nextBoolean ())
       .forEach (bits::fastSet);
 
     return new BinaryVector (this, bits);
+  }
+
+  public void checkCardinality (@NonNull BinaryVector vector) {
+    if (vector.hyperspace () != this)
+      throw new RuntimeException ("vector lies in another space");
   }
 }

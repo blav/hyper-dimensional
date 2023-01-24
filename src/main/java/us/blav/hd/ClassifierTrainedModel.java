@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import lombok.NonNull;
 import us.blav.hd.util.ParallelProcessor;
-import us.blav.hd.util.Timer;
 
 public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>> {
 
@@ -37,13 +36,17 @@ public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>
   }
 
   public double computeAccuracy () {
+    return computeAccuracy (Long.MAX_VALUE);
+  }
+
+  public double computeAccuracy (long limit) {
     AtomicInteger success = new AtomicInteger ();
     AtomicInteger count = new AtomicInteger ();
 
     ParallelProcessor<KEY, ELEMENT, Boolean> processor =
       ParallelProcessor.<KEY, ELEMENT, Boolean>builder ()
-        .threads (10)
-        .queueSize (10)
+        .threads (model.getThreadCount ())
+        .queueSize (model.getQueueSize ())
         .keyMapper (model.getKeyMapper ())
         .processor (digit -> infer (digit) == model.getKeyMapper ().apply (digit))
         .output (result -> {
@@ -53,11 +56,10 @@ public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>
         })
         .build ();
 
-    try (
-      Stream<ELEMENT> dataset = model.getValidateDataset ().get ();
-      Timer ignore = new Timer (duration -> System.out.printf ("inference took %ds%n", duration.toSeconds ()))
-    ) {
-      dataset.forEach (processor::process);
+    try (Stream<ELEMENT> dataset = model.getValidateDataset ().get ();) {
+      dataset
+        .limit (limit)
+        .forEach (processor::process);
     } finally {
       processor.shutdown ();
     }

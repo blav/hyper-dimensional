@@ -2,12 +2,13 @@ package us.blav.hd;
 
 import lombok.NonNull;
 import org.apache.lucene.util.OpenBitSet;
+import us.blav.hd.util.OpenBitSetEnh;
 
 public class Combiner implements Accumulator<Combiner> {
 
   private final Hyperspace hyperspace;
 
-  private OpenBitSet accumulator;
+  private OpenBitSetEnh accumulator;
 
   public Combiner (Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
@@ -18,7 +19,7 @@ public class Combiner implements Accumulator<Combiner> {
       throw new IllegalArgumentException ();
 
     if (accumulator == null) {
-      accumulator = (OpenBitSet) vector.bits ().clone ();
+      accumulator = (OpenBitSetEnh) vector.bits ().clone ();
     } else {
       accumulator.xor (vector.bits ());
     }

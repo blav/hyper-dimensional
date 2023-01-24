@@ -4,9 +4,12 @@ import java.io.Closeable;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import lombok.NonNull;
+
+import static java.util.Optional.ofNullable;
 
 public class Timer implements Closeable {
 
@@ -22,6 +25,7 @@ public class Timer implements Closeable {
   @Override
   public void close () {
     Instant now = Clock.systemUTC ().instant ();
-    onClose.accept (Duration.between (start, now));
+    ofNullable (onClose)
+      .ifPresent (consumer -> consumer.accept (Duration.between (start, now)));
   }
 }

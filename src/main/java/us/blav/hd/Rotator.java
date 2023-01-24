@@ -1,6 +1,7 @@
 package us.blav.hd;
 
 import org.apache.lucene.util.OpenBitSet;
+import us.blav.hd.util.OpenBitSetEnh;
 
 public class Rotator {
 
@@ -21,7 +22,7 @@ public class Rotator {
     if (rotation % dimensions == 0)
       return vector;
 
-    OpenBitSet result = new OpenBitSet (dimensions);
+    OpenBitSetEnh result = new OpenBitSetEnh (dimensions);
     for (int i = 0; i < dimensions; i++)
       if (vector.bits ().get (i))
         result.fastSet ((i + rotation + dimensions) % dimensions);
