@@ -2,8 +2,11 @@ package us.blav.hd;
 
 import java.util.Random;
 
+import lombok.Getter;
+
 public class RandomGenerator {
 
+  @Getter
   private final Random random;
 
   public RandomGenerator () {

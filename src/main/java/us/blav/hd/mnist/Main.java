@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 import com.google.common.util.concurrent.AtomicDouble;
 import us.blav.hd.ClassifierTrainedModel;
 import us.blav.hd.mnist.DatasetLoader.Digit;
+import us.blav.hd.reca.Rule;
 import us.blav.hd.util.Timer;
 
 public class Main {
@@ -38,11 +39,14 @@ public class Main {
   }
 
   private static double benchmark (int dimensions) {
-    ClassifierTrainedModel<Digit, Integer> trained = HyperVectorModel.builder ()
-      .dimensions (dimensions)
-      .build ()
+//    ClassifierTrainedModel<Digit, Integer> trained = HyperVectorModel.builder ()
+//      .dimensions (dimensions)
+//      .build ()
+//      .newModel ()
+//      .train (2000L);
+    ClassifierTrainedModel<Digit, Integer> trained = new CellularModel (40, new Rule (110), 4)
       .newModel ()
-      .train (2000L);
+      .train (1000L);
 
     AtomicDouble accuracy = new AtomicDouble ();
     Consumer<Duration> logger = duration -> System.out.printf (

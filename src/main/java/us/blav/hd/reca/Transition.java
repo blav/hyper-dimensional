@@ -18,8 +18,8 @@ public class Transition {
   private final Rule rule;
 
   public Transition (Hyperspace hyperspace, Rule rule) {
-    if (hyperspace.dimensions () % Long.SIZE > 0)
-      throw new IllegalArgumentException ("dimensions must be a multiple of " + Long.SIZE);
+    if (hyperspace.dimensions () % Short.SIZE > 0)
+      throw new IllegalArgumentException ("dimensions must be a multiple of " + Short.SIZE);
 
     this.hyperspace = hyperspace;
     this.rule = rule;
@@ -31,8 +31,8 @@ public class Transition {
           OpenBitSetEnh in = new OpenBitSetEnh (SIZE * 3);
           in.set (SIZE - 1, left != 0);
           in.set (2 * SIZE, right != 0);
-          in.setWord (1, block);
-          transitions[(left + right * 2) * blocks + block] = (short) slowNext (in).getWord (1);
+          in.setShortWord (1, (short) block);
+          transitions[(left + right * 2) * blocks + block] = slowNext (in).getShortWord (1);
         }
       }
     }

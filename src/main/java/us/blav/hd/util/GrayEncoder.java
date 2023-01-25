@@ -3,6 +3,7 @@ package us.blav.hd.util;
 import java.util.stream.IntStream;
 
 import static java.lang.Byte.SIZE;
+import static java.lang.Byte.toUnsignedInt;
 
 public class GrayEncoder {
 
@@ -18,6 +19,6 @@ public class GrayEncoder {
   }
 
   public byte encode (byte index) {
-    return codes[index];
+    return codes[toUnsignedInt (index)];
   }
 }

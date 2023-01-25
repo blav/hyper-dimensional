@@ -13,8 +13,11 @@ public class Rule {
 
   byte id;
 
-  public Rule (byte id) {
-    this.id = id;
+  public Rule (int id) {
+    if (id < 0 || id >= 256)
+      throw new IllegalArgumentException ();
+
+    this.id = (byte) id;
     this.rule = new boolean[SIZE];
     for (int i = 0; i < SIZE; i++) {
       byte mask = (byte) (1 << i);

@@ -18,7 +18,7 @@ public class Bundler implements Accumulator<Bundler> {
   }
 
   public Bundler add (@NonNull BinaryVector vector) {
-    if (vector.hyperspace () != hyperspace)
+    if (vector.hyperspace ().dimensions () != hyperspace.dimensions ())
       throw new IllegalArgumentException ();
 
     count++;

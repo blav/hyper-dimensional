@@ -4,6 +4,7 @@ import org.apache.lucene.util.OpenBitSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import us.blav.hd.util.OpenBitSetEnh;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +15,7 @@ class BinaryVectorTest {
 
   @Test
   public void toString_should_serialize_bits () {
-    OpenBitSet bitSet = new OpenBitSet (hyperspace.dimensions ());
+    OpenBitSetEnh bitSet = new OpenBitSetEnh (hyperspace.dimensions ());
     bitSet.set (0);
     bitSet.set (2);
 
