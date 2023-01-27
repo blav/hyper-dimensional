@@ -1,5 +1,6 @@
 package us.blav.hd.mnist;
 
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -17,6 +18,7 @@ import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.StreamSupport.stream;
 
+@Singleton
 public class DatasetLoader {
 
   public enum Dataset {

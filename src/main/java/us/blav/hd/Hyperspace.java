@@ -37,7 +37,7 @@ public class Hyperspace {
 
   @VisibleForTesting
   public Hyperspace (int dimensions) {
-    this (dimensions, new RandomGenerator (), null, null, null);
+    this (dimensions, new RandomGenerator (), null, null, null, null, null);
   }
 
   @Inject
@@ -47,7 +47,9 @@ public class Hyperspace {
     RandomGenerator randomGenerator,
     Combiner.Factory combinerFactory,
     Bundler.Factory bundlerFactory,
-    Rotator.Factory rotatorFactory
+    Rotator.Factory rotatorFactory,
+    Cosine.Factory cosineFactory,
+    Hamming.Factory hammingFactory
   ) {
     this.combinerFactory = combinerFactory;
     this.bundlerFactory = bundlerFactory;
@@ -57,8 +59,8 @@ public class Hyperspace {
 
     this.dimensions = dimensions;
     this.randomGenerator = randomGenerator;
-    this.cosine = new Cosine (this);
-    this.hamming = new Hamming (this);
+    this.cosine = cosineFactory.create (this);
+    this.hamming = hammingFactory.create (this);
   }
 
   public Combiner newCombiner () {

@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import lombok.NonNull;

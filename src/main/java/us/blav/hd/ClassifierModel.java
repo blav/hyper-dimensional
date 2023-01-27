@@ -26,10 +26,10 @@ public class ClassifierModel<ELEMENT, KEY extends Comparable<? super KEY>> {
   @Getter
   private final Function<ELEMENT, KEY> keyMapper;
 
-  private final Supplier<Stream<ELEMENT>> trainDataset;
+  private final Supplier<Stream<ELEMENT>> trainingDataset;
 
   @Getter
-  private final Supplier<Stream<ELEMENT>> validateDataset;
+  private final Supplier<Stream<ELEMENT>> validationDataset;
 
   private final Consumer<Duration> trainingDuration;
 
@@ -45,8 +45,8 @@ public class ClassifierModel<ELEMENT, KEY extends Comparable<? super KEY>> {
     @NonNull Hyperspace hyperspace,
     @NonNull Function<ELEMENT, BinaryVector> encoder,
     @NonNull Function<ELEMENT, KEY> keyMapper,
-    @NonNull Supplier<Stream<ELEMENT>> trainDataset,
-    @NonNull Supplier<Stream<ELEMENT>> validateDataset,
+    @NonNull Supplier<Stream<ELEMENT>> trainingDataset,
+    @NonNull Supplier<Stream<ELEMENT>> validationDataset,
     Consumer<Duration> trainingDuration,
     int threadCount,
     int queueSize
@@ -54,8 +54,8 @@ public class ClassifierModel<ELEMENT, KEY extends Comparable<? super KEY>> {
     this.hyperspace = hyperspace;
     this.encoder = encoder;
     this.keyMapper = keyMapper;
-    this.trainDataset = trainDataset;
-    this.validateDataset = validateDataset;
+    this.trainingDataset = trainingDataset;
+    this.validationDataset = validationDataset;
     this.trainingDuration = trainingDuration;
     this.threadCount = threadCount;
     this.queueSize = queueSize;
@@ -80,7 +80,7 @@ public class ClassifierModel<ELEMENT, KEY extends Comparable<? super KEY>> {
         .build ();
 
     try (
-      Stream<ELEMENT> dataset = trainDataset.get ();
+      Stream<ELEMENT> dataset = trainingDataset.get ();
       Timer ignore = new Timer (trainingDuration)
     ) {
       dataset

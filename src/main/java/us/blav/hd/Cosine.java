@@ -1,5 +1,8 @@
 package us.blav.hd;
 
+import javax.inject.Inject;
+
+import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
 
 import static java.util.stream.IntStream.range;
@@ -9,7 +12,14 @@ public class Cosine implements Metric {
 
   private final Hyperspace hyperspace;
 
-  public Cosine (Hyperspace hyperspace) {
+  public interface Factory {
+
+    Cosine create (Hyperspace hyperspace);
+
+  }
+
+  @Inject
+  public Cosine (@Assisted Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
   }
 

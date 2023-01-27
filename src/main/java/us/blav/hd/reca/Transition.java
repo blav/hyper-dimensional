@@ -71,4 +71,10 @@ public class Transition {
 
     return next;
   }
+
+  public interface Factory {
+
+    Transition create (Rule rule);
+
+  }
 }

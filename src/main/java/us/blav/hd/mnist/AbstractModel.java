@@ -1,9 +1,9 @@
 package us.blav.hd.mnist;
 
+import javax.inject.Inject;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import us.blav.hd.BinaryVector;
 import us.blav.hd.ClassifierModel;
@@ -18,11 +18,11 @@ public abstract class AbstractModel {
   @Getter
   protected final Hyperspace hyperspace;
 
-  protected final DatasetLoader loader;
+  @Inject
+  protected DatasetLoader loader;
 
   protected AbstractModel (Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
-    loader = new DatasetLoader ();
   }
 
   public ClassifierModel<Digit, Integer> newModel () {

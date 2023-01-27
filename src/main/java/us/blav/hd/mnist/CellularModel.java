@@ -7,12 +7,11 @@ import com.google.inject.assistedinject.Assisted;
 import us.blav.hd.BinaryVector;
 import us.blav.hd.Bundler;
 import us.blav.hd.Combiner;
+import us.blav.hd.GrayEncoder;
 import us.blav.hd.Hyperspace;
 import us.blav.hd.mnist.DatasetLoader.Digit;
 import us.blav.hd.reca.Rule;
 import us.blav.hd.reca.Transition;
-import us.blav.hd.reca.TransitionFactory;
-import us.blav.hd.GrayEncoder;
 
 import static us.blav.hd.mnist.DatasetLoader.Digit.PIXEL_COUNT;
 
@@ -37,7 +36,7 @@ public class CellularModel extends AbstractModel {
     @Assisted int reservoirDepth,
     @Assisted Rule rule,
     GrayEncoder grayEncoder,
-    TransitionFactory transitionFactory,
+    Transition.Factory transitionFactory,
     Hyperspace.Factory hyperspaceFactory
   ) {
     super (hyperspaceFactory.create (PIXEL_COUNT));
@@ -45,7 +44,7 @@ public class CellularModel extends AbstractModel {
     this.grayEncoder = grayEncoder;
     this.transition = transitionFactory.create (rule);
     this.features = IntStream.range (0, PIXEL_COUNT)
-      .mapToObj (ignore -> getHyperspace ().newRandom ())
+      .mapToObj (ignore -> hyperspace.newRandom ())
       .toArray (BinaryVector[]::new);
   }
 

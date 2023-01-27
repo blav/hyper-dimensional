@@ -4,7 +4,6 @@ import javax.inject.Inject;
 import java.util.List;
 
 import com.google.inject.assistedinject.Assisted;
-import lombok.Builder;
 import us.blav.hd.BinaryVector;
 import us.blav.hd.Bundler;
 import us.blav.hd.Hyperspace;

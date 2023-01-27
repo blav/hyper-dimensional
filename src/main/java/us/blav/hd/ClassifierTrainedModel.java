@@ -56,7 +56,7 @@ public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>
         })
         .build ();
 
-    try (Stream<ELEMENT> dataset = model.getValidateDataset ().get ();) {
+    try (Stream<ELEMENT> dataset = model.getValidationDataset ().get ()) {
       dataset
         .limit (limit)
         .forEach (processor::process);
