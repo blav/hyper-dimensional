@@ -4,6 +4,7 @@ import org.apache.lucene.util.OpenBitSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +25,7 @@ class HyperspaceTest {
   @Test
   public void should_generate_random () {
     when (random.nextBoolean ()).thenReturn (true, false, true);
-    Hyperspace hyperspace = new Hyperspace (3, random, null, null, null);
+    Hyperspace hyperspace = new Hyperspace (3, random, null, null, null, Cosine::new, Hamming::new);
     assertThat (hyperspace.newRandom ().toString ()).isEqualTo ("101");
   }
 

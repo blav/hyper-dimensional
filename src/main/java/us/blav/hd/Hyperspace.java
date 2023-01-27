@@ -37,7 +37,8 @@ public class Hyperspace {
 
   @VisibleForTesting
   public Hyperspace (int dimensions) {
-    this (dimensions, new RandomGenerator (), null, null, null, null, null);
+    this (dimensions, new RandomGenerator (),
+      Combiner::new, Bundler::new, Rotator::new, Cosine::new, Hamming::new);
   }
 
   @Inject
