@@ -1,11 +1,13 @@
 package us.blav.hd;
 
+import javax.inject.Inject;
+
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import org.apache.lucene.util.OpenBitSet;
-import us.blav.hd.util.OpenBitSetEnh;
+import us.blav.hd.util.BitString;
 
 import static java.util.stream.IntStream.range;
 
@@ -21,12 +23,35 @@ public class Hyperspace {
 
   private final Hamming hamming;
 
-  public Hyperspace (int dimensions) {
-    this (dimensions, new RandomGenerator ());
+  public interface Factory {
+
+    Hyperspace create (int dimensions);
+
   }
 
+  private final Combiner.Factory combinerFactory;
+
+  private final Bundler.Factory bundlerFactory;
+
+  private final Rotator.Factory rotatorFactory;
+
   @VisibleForTesting
-  Hyperspace (int dimensions, RandomGenerator randomGenerator) {
+  public Hyperspace (int dimensions) {
+    this (dimensions, new RandomGenerator (), null, null, null);
+  }
+
+  @Inject
+  @VisibleForTesting
+  Hyperspace (
+    @Assisted int dimensions,
+    RandomGenerator randomGenerator,
+    Combiner.Factory combinerFactory,
+    Bundler.Factory bundlerFactory,
+    Rotator.Factory rotatorFactory
+  ) {
+    this.combinerFactory = combinerFactory;
+    this.bundlerFactory = bundlerFactory;
+    this.rotatorFactory = rotatorFactory;
     if (dimensions <= 0)
       throw new IllegalArgumentException ("dimensions must > 0");
 
@@ -37,15 +62,15 @@ public class Hyperspace {
   }
 
   public Combiner newCombiner () {
-    return new Combiner (this);
+    return combinerFactory.create (this);
   }
 
   public Bundler newBundler () {
-    return new Bundler (this);
+    return bundlerFactory.create (this);
   }
 
   public Rotator newRotator (int rotation) {
-    return new Rotator (this, rotation);
+    return rotatorFactory.create (this, rotation);
   }
 
   public BinaryVector newZero () {
@@ -64,7 +89,7 @@ public class Hyperspace {
     if (bits.length != dimensions)
       throw new IllegalArgumentException ();
 
-    OpenBitSetEnh result = new OpenBitSetEnh (dimensions);
+    BitString result = new BitString (dimensions);
     range (0, dimensions)
       .filter (i -> bits[i] > 0)
       .forEach (result::fastSet);
@@ -73,7 +98,7 @@ public class Hyperspace {
   }
 
   public BinaryVector newRandom () {
-    OpenBitSetEnh bits = new OpenBitSetEnh (dimensions);
+    BitString bits = new BitString (dimensions);
     range (0, dimensions)
       .filter (i -> randomGenerator.nextBoolean ())
       .forEach (bits::fastSet);

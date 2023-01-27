@@ -1,13 +1,18 @@
-package us.blav.hd.util;
+package us.blav.hd;
 
+import javax.inject.Singleton;
 import java.util.stream.IntStream;
+
+import lombok.Value;
 
 import static java.lang.Byte.SIZE;
 import static java.lang.Byte.toUnsignedInt;
 
-public class GrayEncoder {
+@Value
+@Singleton
+public class GrayEncoder implements ByteEncoder {
 
-  private final byte[] codes;
+  byte[] codes;
 
   public GrayEncoder () {
     codes = new byte[1 << SIZE];
@@ -18,6 +23,7 @@ public class GrayEncoder {
     });
   }
 
+  @Override
   public byte encode (byte index) {
     return codes[toUnsignedInt (index)];
   }

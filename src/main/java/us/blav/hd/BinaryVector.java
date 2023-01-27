@@ -3,8 +3,7 @@ package us.blav.hd;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import org.apache.lucene.util.OpenBitSet;
-import us.blav.hd.util.OpenBitSetEnh;
+import us.blav.hd.util.BitString;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
@@ -16,10 +15,10 @@ public class BinaryVector {
 
   Hyperspace hyperspace;
 
-  OpenBitSetEnh bits;
+  BitString bits;
 
   public BinaryVector (Hyperspace hyperspace) {
-    this (hyperspace, new OpenBitSetEnh (hyperspace.dimensions ()));
+    this (hyperspace, new BitString (hyperspace.dimensions ()));
   }
 
   public String toString () {

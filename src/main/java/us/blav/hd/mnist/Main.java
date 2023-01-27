@@ -11,9 +11,12 @@ import java.util.stream.IntStream;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import us.blav.hd.ClassifierTrainedModel;
+import us.blav.hd.mnist.CellularModel.Factory;
 import us.blav.hd.mnist.DatasetLoader.Digit;
 import us.blav.hd.reca.Rule;
 import us.blav.hd.util.Timer;
+
+import static us.blav.hd.Injection.getInstance;
 
 public class Main {
 
@@ -44,9 +47,10 @@ public class Main {
 //      .build ()
 //      .newModel ()
 //      .train (2000L);
-    ClassifierTrainedModel<Digit, Integer> trained = new CellularModel (40, new Rule (110), 4)
+    ClassifierTrainedModel<Digit, Integer> trained = getInstance (Factory.class)
+      .create (10, new Rule (110))
       .newModel ()
-      .train (1000L);
+      .train (10000L);
 
     AtomicDouble accuracy = new AtomicDouble ();
     Consumer<Duration> logger = duration -> System.out.printf (

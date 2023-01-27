@@ -2,12 +2,12 @@ package us.blav.hd.util;
 
 import org.apache.lucene.util.OpenBitSet;
 
-public class OpenBitSetEnh extends OpenBitSet {
+public class BitString extends OpenBitSet {
 
   private static final int SHORTS_PER_LONG = Long.SIZE / Short.SIZE;
   private static final int BYTES_PER_LONG = Long.SIZE / Byte.SIZE;
 
-  public OpenBitSetEnh (int dimensions) {
+  public BitString (int dimensions) {
     super (dimensions);
   }
 

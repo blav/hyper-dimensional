@@ -1,10 +1,9 @@
 package us.blav.hd;
 
-import org.apache.lucene.util.OpenBitSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import us.blav.hd.util.OpenBitSetEnh;
+import us.blav.hd.util.BitString;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,7 +14,7 @@ class BinaryVectorTest {
 
   @Test
   public void toString_should_serialize_bits () {
-    OpenBitSetEnh bitSet = new OpenBitSetEnh (hyperspace.dimensions ());
+    BitString bitSet = new BitString (hyperspace.dimensions ());
     bitSet.set (0);
     bitSet.set (2);
 

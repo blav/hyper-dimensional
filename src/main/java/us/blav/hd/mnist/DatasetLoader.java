@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
+import us.blav.hd.ByteEncoder;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -17,8 +19,6 @@ import static java.util.stream.StreamSupport.stream;
 
 public class DatasetLoader {
 
-  public static final int PIXEL_COUNT = 28 * 28;
-
   public enum Dataset {
     train,
     t10k
@@ -26,6 +26,8 @@ public class DatasetLoader {
   }
 
   public static class Digit {
+
+    public static final int PIXEL_COUNT = 28 * 28;
 
     private final byte[] pixels;
 
@@ -37,14 +39,22 @@ public class DatasetLoader {
     }
 
     public int pixel (int index) {
-      if (index < 0 || index >= PIXEL_COUNT)
-        throw new IllegalArgumentException ();
-
+      checkRange (index);
       return Byte.toUnsignedInt (pixels[index]);
+    }
+
+    public byte pixel (int index, @NonNull ByteEncoder encoder) {
+      checkRange (index);
+      return encoder.encode (pixels[index]);
     }
 
     public int label () {
       return label;
+    }
+
+    private void checkRange (int index) {
+      if (index < 0 || index >= PIXEL_COUNT)
+        throw new IllegalArgumentException ();
     }
   }
 
@@ -80,13 +90,13 @@ public class DatasetLoader {
 
       @SneakyThrows (IOException.class)
       private Digit lookupNext () {
-        byte[] digitBuffer = new byte[PIXEL_COUNT];
+        byte[] digitBuffer = new byte[Digit.PIXEL_COUNT];
         byte[] labelBuffer = new byte[1];
         int read = digits.read (digitBuffer);
         if (read == 0)
           return null;
 
-        if (read != PIXEL_COUNT)
+        if (read != Digit.PIXEL_COUNT)
           return null;
 
         if (labels.read (labelBuffer) != 1)

@@ -24,7 +24,7 @@ class HyperspaceTest {
   @Test
   public void should_generate_random () {
     when (random.nextBoolean ()).thenReturn (true, false, true);
-    Hyperspace hyperspace = new Hyperspace (3, random);
+    Hyperspace hyperspace = new Hyperspace (3, random, null, null, null);
     assertThat (hyperspace.newRandom ().toString ()).isEqualTo ("101");
   }
 

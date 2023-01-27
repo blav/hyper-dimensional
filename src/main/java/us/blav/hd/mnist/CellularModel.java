@@ -1,22 +1,20 @@
 package us.blav.hd.mnist;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.inject.Inject;
 import java.util.stream.IntStream;
 
+import com.google.inject.assistedinject.Assisted;
 import us.blav.hd.BinaryVector;
 import us.blav.hd.Bundler;
-import us.blav.hd.ByteShuffler;
+import us.blav.hd.Combiner;
 import us.blav.hd.Hyperspace;
-import us.blav.hd.Reservoir;
-import us.blav.hd.ReservoirFactory;
 import us.blav.hd.mnist.DatasetLoader.Digit;
 import us.blav.hd.reca.Rule;
 import us.blav.hd.reca.Transition;
-import us.blav.hd.util.GrayEncoder;
-import us.blav.hd.util.OpenBitSetEnh;
+import us.blav.hd.reca.TransitionFactory;
+import us.blav.hd.GrayEncoder;
 
-import static us.blav.hd.mnist.DatasetLoader.PIXEL_COUNT;
+import static us.blav.hd.mnist.DatasetLoader.Digit.PIXEL_COUNT;
 
 public class CellularModel extends AbstractModel {
 
@@ -24,45 +22,63 @@ public class CellularModel extends AbstractModel {
 
   private final Transition transition;
 
-  private final List<ByteShuffler> byteShufflers;
-
-  private final ReservoirFactory reservoirFactory;
-
-  private final Hyperspace digitHyperspace;
-
   private final int reservoirDepth;
 
-  protected CellularModel (int reservoirDepth, Rule rule, int shufflers) {
-    super (new Hyperspace (PIXEL_COUNT * 8 * shufflers));
+  private final BinaryVector[] features;
+
+  interface Factory {
+
+    CellularModel create (int reservoirDepth, Rule rule);
+
+  }
+
+  @Inject
+  protected CellularModel (
+    @Assisted int reservoirDepth,
+    @Assisted Rule rule,
+    GrayEncoder grayEncoder,
+    TransitionFactory transitionFactory,
+    Hyperspace.Factory hyperspaceFactory
+  ) {
+    super (hyperspaceFactory.create (PIXEL_COUNT));
     this.reservoirDepth = reservoirDepth;
-    this.grayEncoder = new GrayEncoder ();
-    this.transition = new Transition (hyperspace, rule);
-    this.digitHyperspace = new Hyperspace (PIXEL_COUNT * 8);
-    this.reservoirFactory = new ReservoirFactory (digitHyperspace, shufflers);
-    this.byteShufflers = IntStream.range (0, shufflers - 1)
-      .mapToObj (i -> new ByteShuffler (digitHyperspace))
-      .collect(Collectors.toList());;
+    this.grayEncoder = grayEncoder;
+    this.transition = transitionFactory.create (rule);
+    this.features = IntStream.range (0, PIXEL_COUNT)
+      .mapToObj (ignore -> getHyperspace ().newRandom ())
+      .toArray (BinaryVector[]::new);
   }
 
   @Override
   protected BinaryVector encode (Digit digit) {
-    BinaryVector current = digitHyperspace.newZero ();
-    for (int i = 0; i < PIXEL_COUNT; i++) {
-      OpenBitSetEnh bits = current.bits ();
-      bits.setByteWord (i, grayEncoder.encode ((byte) digit.pixel (i)));
+    byte[] input = new byte[PIXEL_COUNT];
+    IntStream.range (0, PIXEL_COUNT).forEach (i -> input[i] = digit.pixel (i, grayEncoder));
+    Bundler reservoir = hyperspace.newBundler ();
+    BinaryVector current = hyperspace.newZero ();
+    for (int i = 0; i < Byte.SIZE; i++) {
+      byte mask = (byte) (1 << i);
+      BinaryVector vector = hyperspace.newZero ();
+      for (int j = 0; j < PIXEL_COUNT; j++)
+        vector.bits ().set (j, (input[j] & mask) > 0);
+
+      Combiner combiner = hyperspace.newCombiner ();
+      combiner.add (transition.next (vector));
+      combiner.add (current);
+      current = combiner.reduce ();
+      reservoir.add (current);
     }
 
-    Reservoir reservoir = reservoirFactory.newReservoir ();
-    reservoir.set (0, current);
-    for (int i = 0; i < byteShufflers.size (); i ++)
-      reservoir.set (i + 1, byteShufflers.get (i).shuffle (current));
+    for (int i = 0; i < reservoirDepth; i++) {
+      current = transition.next (current);
+      reservoir.add (current);
+    }
 
-    BinaryVector input = reservoir.concat ();
+    BinaryVector encoded = reservoir.reduce ();
     Bundler bundler = hyperspace.newBundler ();
-    for (int d = 0; d < reservoirDepth; d++) {
-      bundler.add (input);
-      input = transition.next (input);
-    }
+    IntStream.range (0, PIXEL_COUNT).forEach (i -> {
+      if (encoded.bits ().get (i))
+        bundler.add (features[i]);
+    });
 
     return bundler.reduce ();
   }

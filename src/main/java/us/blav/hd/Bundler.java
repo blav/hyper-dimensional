@@ -1,8 +1,10 @@
 package us.blav.hd;
 
+import javax.inject.Inject;
+
+import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
-import org.apache.lucene.util.OpenBitSet;
-import us.blav.hd.util.OpenBitSetEnh;
+import us.blav.hd.util.BitString;
 
 public class Bundler implements Accumulator<Bundler> {
 
@@ -12,7 +14,14 @@ public class Bundler implements Accumulator<Bundler> {
 
   private int count;
 
-  public Bundler (Hyperspace hyperspace) {
+  public interface Factory {
+
+    Bundler create (Hyperspace hyperspace);
+
+  }
+
+  @Inject
+  public Bundler (@Assisted Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
     this.accumulator = new int[hyperspace.dimensions ()];
   }
@@ -31,7 +40,7 @@ public class Bundler implements Accumulator<Bundler> {
 
   public BinaryVector reduce () {
     int dimensions = hyperspace.dimensions ();
-    OpenBitSetEnh result = new OpenBitSetEnh (dimensions);
+    BitString result = new BitString (dimensions);
     int threshold = count / 2;
     boolean random = count % 2 == 0;
     for (int i = 0; i < dimensions; i++) {

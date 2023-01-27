@@ -1,7 +1,9 @@
 package us.blav.hd;
 
-import org.apache.lucene.util.OpenBitSet;
-import us.blav.hd.util.OpenBitSetEnh;
+import javax.inject.Inject;
+
+import com.google.inject.assistedinject.Assisted;
+import us.blav.hd.util.BitString;
 
 public class Rotator {
 
@@ -9,7 +11,14 @@ public class Rotator {
 
   private final int rotation;
 
-  public Rotator (Hyperspace hyperspace, int rotation) {
+  public interface Factory {
+
+    Rotator create (Hyperspace hyperspace, int rotation);
+
+  }
+
+  @Inject
+  public Rotator (@Assisted Hyperspace hyperspace, @Assisted int rotation) {
     this.hyperspace = hyperspace;
     this.rotation = rotation;
   }
@@ -22,7 +31,7 @@ public class Rotator {
     if (rotation % dimensions == 0)
       return vector;
 
-    OpenBitSetEnh result = new OpenBitSetEnh (dimensions);
+    BitString result = new BitString (dimensions);
     for (int i = 0; i < dimensions; i++)
       if (vector.bits ().get (i))
         result.fastSet ((i + rotation + dimensions) % dimensions);

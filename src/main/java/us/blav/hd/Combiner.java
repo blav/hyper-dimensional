@@ -1,16 +1,25 @@
 package us.blav.hd;
 
+import javax.inject.Inject;
+
+import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
-import org.apache.lucene.util.OpenBitSet;
-import us.blav.hd.util.OpenBitSetEnh;
+import us.blav.hd.util.BitString;
 
 public class Combiner implements Accumulator<Combiner> {
 
   private final Hyperspace hyperspace;
 
-  private OpenBitSetEnh accumulator;
+  private BitString accumulator;
 
-  public Combiner (Hyperspace hyperspace) {
+  public interface Factory {
+
+    Combiner create (Hyperspace hyperspace);
+
+  }
+
+  @Inject
+  public Combiner (@Assisted Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
   }
 
@@ -19,7 +28,7 @@ public class Combiner implements Accumulator<Combiner> {
       throw new IllegalArgumentException ();
 
     if (accumulator == null) {
-      accumulator = (OpenBitSetEnh) vector.bits ().clone ();
+      accumulator = (BitString) vector.bits ().clone ();
     } else {
       accumulator.xor (vector.bits ());
     }
