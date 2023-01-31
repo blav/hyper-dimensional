@@ -66,8 +66,8 @@ public class ClassifierModel<ELEMENT, KEY extends Comparable<? super KEY>> {
   }
 
   public ClassifierTrainedModel<ELEMENT, KEY> train (long limit) {
-    ParallelReducer<KEY, ELEMENT, Bundler, Map<KEY, BinaryVector>> parallelReducer =
-      ParallelReducer.<KEY, ELEMENT, Bundler, Map<KEY, BinaryVector>>builder ()
+    ParallelReducer<KEY, ELEMENT, Bundler, Map<BinaryVector, KEY>> parallelReducer =
+      ParallelReducer.<KEY, ELEMENT, Bundler, Map<BinaryVector, KEY>>builder ()
         .threads (threadCount)
         .queueSize (queueSize)
         .keyMapper (keyMapper)
@@ -75,7 +75,7 @@ public class ClassifierModel<ELEMENT, KEY extends Comparable<? super KEY>> {
         .combiner ((bundler, digit) -> bundler.add (encoder.apply (digit)))
         .reducer (map -> map.entrySet ().stream ()
           .sorted (Entry.comparingByKey ())
-          .map (entry -> Map.entry (entry.getKey (), entry.getValue ().reduce ()))
+          .map (entry -> Map.entry (entry.getValue ().reduce (), entry.getKey ()))
           .collect (Collectors.toMap (Entry::getKey, Entry::getValue)))
         .build ();
 

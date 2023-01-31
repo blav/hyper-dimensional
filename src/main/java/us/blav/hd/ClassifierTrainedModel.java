@@ -1,7 +1,6 @@
 package us.blav.hd;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -10,29 +9,19 @@ import us.blav.hd.util.ParallelProcessor;
 
 public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>> {
 
-  private final Map<KEY, BinaryVector> classes;
-
   private final ClassifierModel<ELEMENT, KEY> model;
 
-  public ClassifierTrainedModel (@NonNull ClassifierModel<ELEMENT, KEY> model, @NonNull Map<KEY, BinaryVector> classes) {
-    this.classes = classes;
+  private final AssociativeMemory<KEY> memory;
+
+  public ClassifierTrainedModel (@NonNull ClassifierModel<ELEMENT, KEY> model, @NonNull Map<BinaryVector, KEY> classes) {
     this.model = model;
+    this.memory = model.getHyperspace ()
+      .<KEY>newAssociativeMemory ()
+      .add (classes);
   }
 
   public KEY infer (ELEMENT element) {
-    BinaryVector vector = model.getEncoder ().apply (element);
-    Double similarity = null;
-    KEY nearest = null;
-    Metric metric = model.getHyperspace ().cosine ();
-    for (Entry<KEY, BinaryVector> entry : classes.entrySet ()) {
-      double s = metric.apply (vector, entry.getValue ());
-      if (similarity == null || s > similarity) {
-        similarity = s;
-        nearest = entry.getKey ();
-      }
-    }
-
-    return nearest;
+    return memory.lookup (model.getEncoder ().apply (element)).getValue ();
   }
 
   public double computeAccuracy () {

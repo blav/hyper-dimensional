@@ -7,9 +7,7 @@ import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import us.blav.hd.util.BitString;
-
-import static java.util.stream.IntStream.range;
+import us.blav.hd.util.BitHacks;
 
 @Getter
 @Accessors (fluent = true)
@@ -23,45 +21,67 @@ public class Hyperspace {
 
   private final Hamming hamming;
 
-  public interface Factory {
-
-    Hyperspace create (int dimensions);
-
-  }
-
   private final Combiner.Factory combinerFactory;
 
   private final Bundler.Factory bundlerFactory;
 
   private final Rotator.Factory rotatorFactory;
 
+  private final BinaryVectorFactory binaryVectorFactory;
+
+  public interface Factory {
+
+    Hyperspace create (int dimensions);
+
+  }
+
+  private final BitShuffler.Factory bitShufflerFactory;
+
+  private final ByteShuffler.Factory byteShufflerFactory;
+
+  private final AssociativeMemory.Factory associativeMemoryFactory;
+
   @VisibleForTesting
   public Hyperspace (int dimensions) {
-    this (dimensions, new RandomGenerator (),
-      Combiner::new, Bundler::new, Rotator::new, Cosine::new, Hamming::new);
+    this (dimensions, new RandomGenerator ());
+  }
+
+  @VisibleForTesting
+  public Hyperspace (int dimensions, RandomGenerator randomGenerator) {
+    this (dimensions, randomGenerator,
+      Combiner::new, Bundler::new, Rotator::new, h -> new Cosine (h, new BitHacks ()),
+      h -> new Hamming (h, new BitHacks ()), BitShuffler::new, ByteShuffler::new,
+      new AssociativeMemory.Factory (), new BinaryVectorFactory ());
   }
 
   @Inject
-  @VisibleForTesting
   Hyperspace (
     @Assisted int dimensions,
-    RandomGenerator randomGenerator,
-    Combiner.Factory combinerFactory,
-    Bundler.Factory bundlerFactory,
-    Rotator.Factory rotatorFactory,
-    Cosine.Factory cosineFactory,
-    Hamming.Factory hammingFactory
+    @NonNull RandomGenerator randomGenerator,
+    @NonNull Combiner.Factory combinerFactory,
+    @NonNull Bundler.Factory bundlerFactory,
+    @NonNull Rotator.Factory rotatorFactory,
+    @NonNull Cosine.Factory cosineFactory,
+    @NonNull Hamming.Factory hammingFactory,
+    @NonNull BitShuffler.Factory bitShufflerFactory,
+    @NonNull ByteShuffler.Factory byteShufflerFactory,
+    @NonNull AssociativeMemory.Factory associativeMemoryFactory,
+    @NonNull BinaryVectorFactory binaryVectorFactory
   ) {
-    this.combinerFactory = combinerFactory;
-    this.bundlerFactory = bundlerFactory;
-    this.rotatorFactory = rotatorFactory;
     if (dimensions <= 0)
       throw new IllegalArgumentException ("dimensions must > 0");
 
+    this.bitShufflerFactory = bitShufflerFactory;
+    this.byteShufflerFactory = byteShufflerFactory;
+    this.combinerFactory = combinerFactory;
+    this.bundlerFactory = bundlerFactory;
+    this.rotatorFactory = rotatorFactory;
+    this.binaryVectorFactory = binaryVectorFactory;
     this.dimensions = dimensions;
     this.randomGenerator = randomGenerator;
     this.cosine = cosineFactory.create (this);
     this.hamming = hammingFactory.create (this);
+    this.associativeMemoryFactory = associativeMemoryFactory;
   }
 
   public Combiner newCombiner () {
@@ -74,6 +94,14 @@ public class Hyperspace {
 
   public Rotator newRotator (int rotation) {
     return rotatorFactory.create (this, rotation);
+  }
+
+  public BitShuffler newBitShuffler () {
+    return bitShufflerFactory.create (this);
+  }
+
+  public ByteShuffler newByteShuffler () {
+    return byteShufflerFactory.create (this);
   }
 
   public BinaryVector newZero () {
@@ -89,28 +117,14 @@ public class Hyperspace {
   }
 
   public BinaryVector newVector (int... bits) {
-    if (bits.length != dimensions)
-      throw new IllegalArgumentException ();
-
-    BitString result = new BitString (dimensions);
-    range (0, dimensions)
-      .filter (i -> bits[i] > 0)
-      .forEach (result::fastSet);
-
-    return new BinaryVector (this, result);
+    return binaryVectorFactory.newVector (this, bits);
   }
 
   public BinaryVector newRandom () {
-    BitString bits = new BitString (dimensions);
-    range (0, dimensions)
-      .filter (i -> randomGenerator.nextBoolean ())
-      .forEach (bits::fastSet);
-
-    return new BinaryVector (this, bits);
+    return binaryVectorFactory.newRandom (this);
   }
 
-  public void checkCardinality (@NonNull BinaryVector vector) {
-    if (vector.hyperspace () != this)
-      throw new RuntimeException ("vector lies in another space");
+  public <METADATA> AssociativeMemory<METADATA> newAssociativeMemory () {
+    return associativeMemoryFactory.create (this);
   }
 }

@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
@@ -31,12 +31,14 @@ public class Main {
       out.flush ();
       IntStream.of (100, 200, 500, 1000, 2000, 5000, 10000, 20000)
         .forEach (dimensions -> {
-          AtomicLong duration = new AtomicLong ();
-          try (Timer ignore = new Timer (d -> duration.set (d.toSeconds ()))) {
-            double success = benchmark (dimensions);
-            out.printf ("%d;%2.2f%%;%d%n", dimensions, success, duration.get ());
-            out.flush ();
+          AtomicReference<Duration> duration = new AtomicReference<> ();
+          double success;
+          try (Timer ignore = new Timer (duration::set)) {
+            success = benchmark (dimensions);
           }
+
+          out.printf ("%d;%2.2f%%;%d%n", dimensions, success, duration.get ().toSeconds ());
+          out.flush ();
         });
     }
   }

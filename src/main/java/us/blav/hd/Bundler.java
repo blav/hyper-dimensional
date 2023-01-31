@@ -10,18 +10,19 @@ public class Bundler implements Accumulator<Bundler> {
 
   private final int[] accumulator;
 
+  @NonNull
   private final Hyperspace hyperspace;
 
   private int count;
 
   public interface Factory {
 
-    Bundler create (Hyperspace hyperspace);
+    Bundler create (@NonNull Hyperspace hyperspace);
 
   }
 
   @Inject
-  public Bundler (@Assisted Hyperspace hyperspace) {
+  public Bundler (@NonNull @Assisted Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
     this.accumulator = new int[hyperspace.dimensions ()];
   }

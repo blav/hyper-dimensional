@@ -8,18 +8,19 @@ import us.blav.hd.util.BitString;
 
 public class Combiner implements Accumulator<Combiner> {
 
+  @NonNull
   private final Hyperspace hyperspace;
 
   private BitString accumulator;
 
   public interface Factory {
 
-    Combiner create (Hyperspace hyperspace);
+    Combiner create (@NonNull Hyperspace hyperspace);
 
   }
 
   @Inject
-  public Combiner (@Assisted Hyperspace hyperspace) {
+  public Combiner (@NonNull @Assisted Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
   }
 

@@ -1,30 +1,27 @@
 package us.blav.hd.util;
 
 import java.io.Closeable;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.function.Consumer;
 
 import lombok.NonNull;
 
-import static java.util.Optional.ofNullable;
+import static java.lang.System.nanoTime;
+import static java.time.Duration.ofNanos;
 
 public class Timer implements Closeable {
 
-  private final Instant start;
+  private final long start;
 
-  private final Consumer<Duration> onClose;
+  private final Consumer<Duration> consumer;
 
   public Timer (@NonNull Consumer<Duration> onClose) {
-    this.onClose = onClose;
-    this.start = Clock.systemUTC ().instant ();
+    this.consumer = onClose;
+    this.start = nanoTime ();
   }
 
   @Override
   public void close () {
-    Instant now = Clock.systemUTC ().instant ();
-    ofNullable (onClose)
-      .ifPresent (consumer -> consumer.accept (Duration.between (start, now)));
+    consumer.accept (ofNanos (nanoTime () - start));
   }
 }

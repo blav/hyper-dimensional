@@ -18,5 +18,7 @@ public class MainModule implements Module {
     binder.install (new FactoryModuleBuilder ().build (Rotator.Factory.class));
     binder.install (new FactoryModuleBuilder ().build (Cosine.Factory.class));
     binder.install (new FactoryModuleBuilder ().build (Hamming.Factory.class));
+    binder.install (new FactoryModuleBuilder ().build (BitShuffler.Factory.class));
+    binder.install (new FactoryModuleBuilder ().build (ByteShuffler.Factory.class));
   }
 }

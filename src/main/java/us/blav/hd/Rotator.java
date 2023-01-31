@@ -3,22 +3,24 @@ package us.blav.hd;
 import javax.inject.Inject;
 
 import com.google.inject.assistedinject.Assisted;
+import lombok.NonNull;
 import us.blav.hd.util.BitString;
 
 public class Rotator {
 
+  @NonNull
   private final Hyperspace hyperspace;
 
   private final int rotation;
 
   public interface Factory {
 
-    Rotator create (Hyperspace hyperspace, int rotation);
+    Rotator create (@NonNull Hyperspace hyperspace, int rotation);
 
   }
 
   @Inject
-  public Rotator (@Assisted Hyperspace hyperspace, @Assisted int rotation) {
+  public Rotator (@NonNull @Assisted Hyperspace hyperspace, @Assisted int rotation) {
     this.hyperspace = hyperspace;
     this.rotation = rotation;
   }

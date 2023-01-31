@@ -1,33 +1,41 @@
 package us.blav.hd;
 
 import javax.inject.Inject;
+import java.util.stream.IntStream;
 
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
+import us.blav.hd.util.BitHacks;
 
-import static java.util.stream.IntStream.range;
 import static us.blav.hd.Metric.ensureDimensions;
 
 public class Hamming implements Metric {
 
+  @NonNull
   private final Hyperspace hyperspace;
+
+  private final BitHacks hacks;
 
   public interface Factory {
 
-    Hamming create (Hyperspace hyperspace);
+    Hamming create (@NonNull Hyperspace hyperspace);
 
   }
 
   @Inject
-  public Hamming (@Assisted Hyperspace hyperspace) {
+  public Hamming (@NonNull @Assisted Hyperspace hyperspace, BitHacks hacks) {
     this.hyperspace = hyperspace;
+    this.hacks = hacks;
   }
 
   @Override
   public double apply (@NonNull BinaryVector a, @NonNull BinaryVector b) {
     ensureDimensions (hyperspace, a, b);
-    return 1. * range (0, hyperspace.dimensions ())
-      .filter (i -> a.bits ().get (i) == b.bits ().get (i))
-      .count () / hyperspace.dimensions ();
+    int dimensions = hyperspace.dimensions ();
+    long differing = IntStream.range (0, a.bits ().getNumWords ())
+      .map (i -> hacks.countSet (a.bits ().getLongWord (i) ^ b.bits ().getLongWord (i)))
+      .sum ();
+
+    return 1. - 1. * differing / hyperspace.dimensions ();
   }
 }

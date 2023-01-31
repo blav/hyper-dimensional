@@ -1,39 +1,30 @@
 package us.blav.hd;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collector;
+import javax.inject.Inject;
 import java.util.stream.IntStream;
 
-import lombok.Getter;
-import lombok.Value;
+import com.google.inject.assistedinject.Assisted;
+import lombok.NonNull;
 
-@Value
-public class ByteShuffler {
+public class ByteShuffler extends AbstractShuffler {
 
-  @Getter
-  Hyperspace hyperspace;
+  interface Factory {
 
-  int[] mapping;
+    ByteShuffler create (Hyperspace hyperspace);
 
-  public ByteShuffler (Hyperspace hyperspace) {
+  }
+
+  @Inject
+  public ByteShuffler (@NonNull @Assisted Hyperspace hyperspace) {
+    super (hyperspace, hyperspace.randomGenerator (), computeSize (hyperspace));
+  }
+
+  private static int computeSize (Hyperspace hyperspace) {
     int dimensions = hyperspace.dimensions ();
     if (dimensions % Byte.SIZE != 0)
       throw new IllegalArgumentException ("hyperspace dimension must be a multiple of " + Byte.SIZE);
 
-    int size = dimensions / Byte.SIZE;
-    this.hyperspace = hyperspace;
-    this.mapping = new int[size];
-    List<Integer> mapping = IntStream.range (0, size)
-      .boxed ()
-      .collect (Collector.of (ArrayList::new, List::add, (a, b) -> {
-        a.addAll (b);
-        return a;
-      }));
-
-    Collections.shuffle (mapping, hyperspace.randomGenerator ().getRandom ());
-    mapping.forEach (i -> this.mapping[i] = mapping.get (i));
+    return dimensions / Byte.SIZE;
   }
 
   public BinaryVector shuffle (BinaryVector vector) {

@@ -11,12 +11,12 @@ public class BitString extends OpenBitSet {
     super (dimensions);
   }
 
-  public void setWord (int wordPosition, long value) {
+  public void setLongWord (int wordPosition, long value) {
     assert wordPosition >= 0 && wordPosition < bits.length : "index out of range";
     bits[wordPosition] = value;
   }
 
-  public long getWord (int wordPosition) {
+  public long getLongWord (int wordPosition) {
     assert wordPosition >= 0 && wordPosition < bits.length : "index out of range";
     return bits[wordPosition];
   }

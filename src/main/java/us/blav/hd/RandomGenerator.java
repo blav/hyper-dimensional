@@ -16,4 +16,8 @@ public class RandomGenerator {
   public boolean nextBoolean () {
     return random.nextBoolean ();
   }
+
+  public int nextInt (int bound) {
+    return random.nextInt (bound);
+  }
 }

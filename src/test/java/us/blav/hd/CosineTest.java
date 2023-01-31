@@ -3,6 +3,7 @@ package us.blav.hd;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import us.blav.hd.util.BitHacks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,7 +12,7 @@ class CosineTest {
 
   private final Hyperspace hyperspace = new Hyperspace (2);
 
-  private final Cosine cosine = new Cosine (hyperspace);
+  private final Cosine cosine = new Cosine (hyperspace, new BitHacks ());
 
   @Test
   public void should_return_1_when_vector_are_parallel () {

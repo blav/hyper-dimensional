@@ -55,8 +55,8 @@ public class Transition {
 
   public BinaryVector next (BinaryVector vector) {
     Hyperspace hyperspace = vector.hyperspace ();
-    if (hyperspace.dimensions () % Short.SIZE > 0)
-      throw new IllegalArgumentException ("dimensions must be a multiple of " + Short.SIZE);
+    if (hyperspace.dimensions () % SIZE > 0)
+      throw new IllegalArgumentException ("dimensions must be a multiple of " + SIZE);
 
     int blocks = 1 << SIZE;
     BinaryVector next = hyperspace.newZero ();
