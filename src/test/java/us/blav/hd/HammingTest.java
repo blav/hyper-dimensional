@@ -15,21 +15,21 @@ class HammingTest {
   private final Hamming hamming = new Hamming (hyperspace, new BitHacks ());
 
   @Test
-  public void should_return_1_when_vector_are_parallel () {
+  public void should_return_0_when_vector_are_parallel () {
     double result = hamming.apply (
       hyperspace.newVector (0, 1),
       hyperspace.newVector (0, 1));
 
-    assertThat (result).isEqualTo (1.0);
+    assertThat (result).isEqualTo (0.0);
   }
 
   @Test
-  public void should_return_minus_1_when_vector_are_opposite () {
+  public void should_return_1_when_vector_are_opposite () {
     double result = hamming.apply (
       hyperspace.newVector (0, 1),
       hyperspace.newVector (1, 0));
 
-    assertThat (result).isEqualTo (0.0);
+    assertThat (result).isEqualTo (1.0);
   }
 
   @Test

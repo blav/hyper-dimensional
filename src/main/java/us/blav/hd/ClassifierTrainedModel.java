@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import lombok.NonNull;
+import us.blav.hd.util.Pair;
 import us.blav.hd.util.ParallelProcessor;
 
 public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>> {
@@ -21,7 +22,9 @@ public class ClassifierTrainedModel<ELEMENT, KEY extends Comparable<? super KEY>
   }
 
   public KEY infer (ELEMENT element) {
-    return memory.lookup (model.getEncoder ().apply (element)).getValue ();
+    return memory.lookup (model.getEncoder ().apply (element))
+      .map (Pair::b)
+      .orElseThrow (IllegalStateException::new);
   }
 
   public double computeAccuracy () {

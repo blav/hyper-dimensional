@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
@@ -36,7 +36,7 @@ public class Rotator {
     BitString result = new BitString (dimensions);
     for (int i = 0; i < dimensions; i++)
       if (vector.bits ().get (i))
-        result.fastSet ((i + rotation + dimensions) % dimensions);
+        result.set ((i + rotation + dimensions) % dimensions);
 
     return new BinaryVector (hyperspace, result);
   }

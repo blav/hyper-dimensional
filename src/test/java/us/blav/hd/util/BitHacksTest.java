@@ -14,8 +14,7 @@ import static org.assertj.core.api.Assertions.fail;
 @ExtendWith (MockitoExtension.class)
 class BitHacksTest {
 
-  @InjectMocks
-  private Random random;
+  private final Random random = new Random ();
 
   @InjectMocks
   private BitHacks hacks;

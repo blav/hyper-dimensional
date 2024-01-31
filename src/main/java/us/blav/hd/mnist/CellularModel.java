@@ -1,6 +1,6 @@
 package us.blav.hd.mnist;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.stream.IntStream;
 
 import com.google.inject.assistedinject.Assisted;

@@ -1,58 +1,58 @@
 package us.blav.hd;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import lombok.Getter;
 import lombok.NonNull;
+import us.blav.hd.util.KDTree;
+import us.blav.hd.util.Pair;
 
 public class AssociativeMemory<METADATA> {
 
-  private final List<Map.Entry<BinaryVector, METADATA>> vectors;
+  private final Map<BinaryVector, METADATA> metadata;
+
+  private final KDTree<BinaryVector> tree;
 
   @Getter
   private final Hyperspace hyperspace;
+
   public static class Factory {
 
+    @Inject
+    private BinaryKDSpace.Factory kdSpaceFactory;
+
     <METADATA> AssociativeMemory<METADATA> create (Hyperspace hyperspace) {
-      return new AssociativeMemory<> (hyperspace);
+      return new AssociativeMemory<> (kdSpaceFactory, hyperspace);
     }
   }
 
   @Inject
-  public AssociativeMemory (@Assisted @NonNull Hyperspace hyperspace) {
+  public AssociativeMemory (BinaryKDSpace.Factory kdSpaceFactory, @Assisted @NonNull Hyperspace hyperspace) {
     this.hyperspace = hyperspace;
-    this.vectors = new ArrayList<> ();
+    this.metadata = new HashMap<> ();
+    this.tree = new KDTree<> (kdSpaceFactory.create (hyperspace));
   }
 
   public AssociativeMemory<METADATA> add (BinaryVector vector, METADATA metadata) {
-    this.vectors.add (Map.entry (vector, metadata));
+    this.metadata.put (vector, metadata);
+    this.tree.add (vector);
     return this;
   }
 
   public AssociativeMemory<METADATA> add (Map<BinaryVector, METADATA> vectors) {
-    this.vectors.addAll (vectors.entrySet ());
+    this.metadata.putAll (vectors);
+    vectors.keySet ().forEach (tree::add);
     return this;
   }
 
-  public Map.Entry<BinaryVector, METADATA> lookup (BinaryVector vector) {
-    if (vectors.isEmpty ())
-      throw new IllegalStateException ();
-
-    Double similarity = null;
-    Map.Entry<BinaryVector, METADATA> nearest = null;
-    Metric metric = hyperspace.cosine ();
-    for (Map.Entry<BinaryVector, METADATA> entity : vectors) {
-      double s = metric.apply (vector, entity.getKey ());
-      if (similarity == null || s > similarity) {
-        similarity = s;
-        nearest = entity;
-      }
-    }
-
-    return nearest;
+  public Optional<Pair<BinaryVector, METADATA>> lookup (BinaryVector vector) {
+    return tree.nearestNeighbourSearch (vector, 1)
+      .stream ()
+      .findFirst ()
+      .map (v -> new Pair<> (v, metadata.get (v)));
   }
 }

@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.stream.IntStream;
 
 import com.google.inject.assistedinject.Assisted;
@@ -8,6 +8,7 @@ import lombok.NonNull;
 import us.blav.hd.util.BitHacks;
 
 import static us.blav.hd.Metric.ensureDimensions;
+
 
 public class Hamming implements Metric {
 
@@ -31,11 +32,10 @@ public class Hamming implements Metric {
   @Override
   public double apply (@NonNull BinaryVector a, @NonNull BinaryVector b) {
     ensureDimensions (hyperspace, a, b);
-    int dimensions = hyperspace.dimensions ();
-    long differing = IntStream.range (0, a.bits ().getNumWords ())
+    double differing = IntStream.range (0, a.bits ().getNumWords ())
       .map (i -> hacks.countSet (a.bits ().getLongWord (i) ^ b.bits ().getLongWord (i)))
       .sum ();
 
-    return 1. - 1. * differing / hyperspace.dimensions ();
+    return differing / hyperspace.dimensions ();
   }
 }

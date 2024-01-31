@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
@@ -41,6 +41,8 @@ public class Hyperspace {
 
   private final AssociativeMemory.Factory associativeMemoryFactory;
 
+  private final SparseDistributedMemory.Factory sparseDistributedMemoryFactory;
+
   @VisibleForTesting
   public Hyperspace (int dimensions) {
     this (dimensions, new RandomGenerator ());
@@ -51,7 +53,7 @@ public class Hyperspace {
     this (dimensions, randomGenerator,
       Combiner::new, Bundler::new, Rotator::new, h -> new Cosine (h, new BitHacks ()),
       h -> new Hamming (h, new BitHacks ()), BitShuffler::new, ByteShuffler::new,
-      new AssociativeMemory.Factory (), new BinaryVectorFactory ());
+      new AssociativeMemory.Factory (), new BinaryVectorFactory (), SparseDistributedMemory::new);
   }
 
   @Inject
@@ -66,8 +68,10 @@ public class Hyperspace {
     @NonNull BitShuffler.Factory bitShufflerFactory,
     @NonNull ByteShuffler.Factory byteShufflerFactory,
     @NonNull AssociativeMemory.Factory associativeMemoryFactory,
-    @NonNull BinaryVectorFactory binaryVectorFactory
+    @NonNull BinaryVectorFactory binaryVectorFactory,
+    @NonNull SparseDistributedMemory.Factory sparseDistributedMemoryFactory
   ) {
+    this.sparseDistributedMemoryFactory = sparseDistributedMemoryFactory;
     if (dimensions <= 0)
       throw new IllegalArgumentException ("dimensions must > 0");
 
@@ -126,5 +130,9 @@ public class Hyperspace {
 
   public <METADATA> AssociativeMemory<METADATA> newAssociativeMemory () {
     return associativeMemoryFactory.create (this);
+  }
+
+  public SparseDistributedMemory newSparseDistributedMemory (int hardLocations) {
+    return sparseDistributedMemoryFactory.create (this, hardLocations);
   }
 }

@@ -26,6 +26,9 @@ public class Rule {
   }
 
   public boolean getState (boolean left, boolean middle, boolean right) {
-    return rule[(left ? 4 : 0) | (middle ? 2 : 0) | (right ? 1 : 0)];
+    return rule[
+      (left ? 4 : 0) |
+        (middle ? 2 : 0) |
+        (right ? 1 : 0)];
   }
 }

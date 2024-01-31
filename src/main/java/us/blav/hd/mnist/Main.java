@@ -11,9 +11,8 @@ import java.util.stream.IntStream;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import us.blav.hd.ClassifierTrainedModel;
-import us.blav.hd.mnist.CellularModel.Factory;
 import us.blav.hd.mnist.DatasetLoader.Digit;
-import us.blav.hd.reca.Rule;
+import us.blav.hd.mnist.HyperVectorModel.Factory;
 import us.blav.hd.util.Timer;
 
 import static us.blav.hd.Injection.getInstance;
@@ -44,13 +43,8 @@ public class Main {
   }
 
   private static double benchmark (int dimensions) {
-//    ClassifierTrainedModel<Digit, Integer> trained = HyperVectorModel.builder ()
-//      .dimensions (dimensions)
-//      .build ()
-//      .newModel ()
-//      .train (2000L);
     ClassifierTrainedModel<Digit, Integer> trained = getInstance (Factory.class)
-      .create (10, new Rule (110))
+      .create (dimensions)
       .newModel ()
       .train (10000L);
 

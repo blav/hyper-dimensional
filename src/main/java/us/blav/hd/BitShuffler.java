@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.stream.IntStream;
 
 import com.google.inject.assistedinject.Assisted;
@@ -10,7 +10,7 @@ public class BitShuffler extends AbstractShuffler {
 
   public interface Factory {
 
-    BitShuffler create (Hyperspace hyperspace);
+    BitShuffler create (@SuppressWarnings ("unused") Hyperspace hyperspace);
 
   }
 

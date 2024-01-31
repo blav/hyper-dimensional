@@ -1,6 +1,6 @@
 package us.blav.hd.mnist;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -22,6 +22,7 @@ import static java.util.stream.StreamSupport.stream;
 public class DatasetLoader {
 
   public enum Dataset {
+
     train,
     t10k
 

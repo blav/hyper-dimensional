@@ -88,6 +88,7 @@ public class ParallelProcessor<KEY, ELEMENT, RESULT> {
       .process (new Message (element));
   }
 
+  @SuppressWarnings ("UnusedReturnValue")
   @SneakyThrows (InterruptedException.class)
   public boolean shutdown () {
     processors.values ().forEach (processor -> processor.process (poison));

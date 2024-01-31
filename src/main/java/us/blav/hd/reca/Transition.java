@@ -1,6 +1,6 @@
 package us.blav.hd.reca;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;

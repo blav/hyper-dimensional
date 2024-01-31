@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
@@ -39,6 +39,10 @@ public class Bundler implements Accumulator<Bundler> {
     return this;
   }
 
+  public double counter (int dimension) {
+    return accumulator[dimension] / (double) hyperspace.dimensions ();
+  }
+
   public BinaryVector reduce () {
     int dimensions = hyperspace.dimensions ();
     BitString result = new BitString (dimensions);
@@ -47,12 +51,12 @@ public class Bundler implements Accumulator<Bundler> {
     for (int i = 0; i < dimensions; i++) {
       int currentCount = accumulator[i];
       if (currentCount > threshold) {
-        result.fastSet (i);
+        result.set (i);
         continue;
       }
 
       if (random && currentCount == threshold && hyperspace.randomGenerator ().nextBoolean ())
-        result.fastSet (i);
+        result.set (i);
     }
 
     return new BinaryVector (hyperspace, result);

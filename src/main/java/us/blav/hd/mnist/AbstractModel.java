@@ -1,6 +1,6 @@
 package us.blav.hd.mnist;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.function.Consumer;
 

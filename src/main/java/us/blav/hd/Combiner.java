@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.google.inject.assistedinject.Assisted;
 import lombok.NonNull;
@@ -15,7 +15,7 @@ public class Combiner implements Accumulator<Combiner> {
 
   public interface Factory {
 
-    Combiner create (@NonNull Hyperspace hyperspace);
+    Combiner create (@SuppressWarnings ("unused") @NonNull Hyperspace hyperspace);
 
   }
 
@@ -29,7 +29,7 @@ public class Combiner implements Accumulator<Combiner> {
       throw new IllegalArgumentException ();
 
     if (accumulator == null) {
-      accumulator = (BitString) vector.bits ().clone ();
+      accumulator = vector.bits ().duplicate ();
     } else {
       accumulator.xor (vector.bits ());
     }

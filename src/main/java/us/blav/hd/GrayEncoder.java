@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.stream.IntStream;
 
 import lombok.Value;

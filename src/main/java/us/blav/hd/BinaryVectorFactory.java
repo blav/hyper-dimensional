@@ -1,6 +1,6 @@
 package us.blav.hd;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import lombok.NonNull;
 import us.blav.hd.util.BitString;
@@ -15,7 +15,7 @@ public class BinaryVectorFactory {
     BitString bits = new BitString (dimensions);
     range (0, dimensions)
       .filter (i -> hyperspace.randomGenerator ().nextBoolean ())
-      .forEach (bits::fastSet);
+      .forEach (bits::set);
 
     return new BinaryVector (hyperspace, bits);
   }
@@ -28,7 +28,7 @@ public class BinaryVectorFactory {
     BitString result = new BitString (dimensions);
     range (0, dimensions)
       .filter (i -> bits[i] > 0)
-      .forEach (result::fastSet);
+      .forEach (result::set);
 
     return new BinaryVector (hyperspace, result);
   }
