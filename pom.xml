@@ -14,10 +14,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <guava.version>33.0.0-jre</guava.version>
     <lombok.version>1.18.30</lombok.version>
-    <assertj-guava.version>3.25.2</assertj-guava.version>
-    <assertj.version>3.25.2</assertj.version>
+    <assertj.version>3.25.3</assertj.version>
     <mockito.version>5.10.0</mockito.version>
-    <junit-jupiter.version>5.10.1</junit-jupiter.version>
+    <junit-jupiter.version>5.10.2</junit-jupiter.version>
     <log4j-api.version>3.0.0-beta1</log4j-api.version>
     <guice.version>7.0.0</guice.version>
     <jna.version>5.14.0</jna.version>
@@ -78,6 +77,23 @@
           <cleanupDaemonThreads>false</cleanupDaemonThreads>
         </configuration>
       </plugin>
+
+      <!-- check for dependency vulnerabilities -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>9.0.9</version>
+        <configuration>
+          <nvdApiKey>4f34fe6e-8af9-4ce5-b846-8bdc512aeff4</nvdApiKey>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -125,7 +141,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-guava</artifactId>
-      <version>${assertj-guava.version}</version>
+      <version>${assertj.version}</version>
       <scope>test</scope>
     </dependency>
 
