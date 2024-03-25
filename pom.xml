@@ -12,16 +12,16 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <guava.version>33.0.0-jre</guava.version>
-    <lombok.version>1.18.30</lombok.version>
+    <guava.version>33.1.0-jre</guava.version>
+    <lombok.version>1.18.32</lombok.version>
     <assertj.version>3.25.3</assertj.version>
-    <mockito.version>5.10.0</mockito.version>
+    <mockito.version>5.11.0</mockito.version>
     <junit-jupiter.version>5.10.2</junit-jupiter.version>
-    <log4j-api.version>3.0.0-beta1</log4j-api.version>
+    <log4j-api.version>3.0.0-beta2</log4j-api.version>
     <guice.version>7.0.0</guice.version>
     <jna.version>5.14.0</jna.version>
     <eclipse-collections.version>12.0.0.M3</eclipse-collections.version>
-    <lucene.version>9.9.2</lucene.version>
+    <lucene.version>9.10.0</lucene.version>
   </properties>
 
   <build>
