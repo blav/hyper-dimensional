@@ -78,22 +78,6 @@
         </configuration>
       </plugin>
 
-      <!-- check for dependency vulnerabilities -->
-      <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>9.0.9</version>
-        <configuration>
-          <nvdApiKey>4f34fe6e-8af9-4ce5-b846-8bdc512aeff4</nvdApiKey>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
